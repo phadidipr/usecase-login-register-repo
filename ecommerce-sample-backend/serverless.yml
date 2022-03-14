@@ -1,0 +1,145 @@
+service: ecommerce-sample-backend
+frameworkVersion: '3.2.0'
+
+provider:
+  name: aws
+  runtime: nodejs12.x
+  stage: dev
+  region: us-west-2
+  environment:
+    ACCOUNT_TABLE: ${self:service}-${opt:stage, self:provider.stage}
+    ACCOUNT_EMAIL_TABLE: "account-email-${opt:stage, self:provider.stage}"
+    BACKEND_PICTURES: ecommerce-sample-backend-${self:provider.stage}
+    REGION: us-west-2
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - dynamodb:Query
+        - dynamodb:Scan
+        - dynamodb:GetItem
+        - dynamodb:PutItem
+        - s3:Get*
+        - s3:List*
+        - s3:GetObject
+        - s3:DeleteObject
+        - s3:PutObject
+        - lambda:InvokeFunction
+        - cognito-idp:AdminInitiateAuth
+        - cognito-idp:AdminCreateUser
+        - cognito-idp:AdminSetUserPassword
+      Resource: "*"
+
+functions:
+  login:
+    handler: src/login/login.handler
+    events:
+      - http:
+          path: /login
+          cors: true
+          method: post
+      - cognitoUserPool:
+        pool: EmployeePool
+        trigger: login
+      - cognitoUserPool:
+        pool: NonEmployeePool
+        trigger: login
+  register:
+    handler: src/register/register.handler
+    events:
+      - http:
+          path: /register
+          cors: true
+          method: post
+      - cognitoUserPool:
+        pool: EmployeePool
+        trigger: register
+      - cognitoUserPool:
+        pool: NonEmployeePool
+        trigger: register
+  confirm:
+    handler: src/confirm/confirm.handler
+    events:
+      - http:
+          path: /confirm
+          cors: true
+          method: post
+      - cognitoUserPool:
+        pool: EmployeePool
+        trigger: confirm
+      - cognitoUserPool:
+        pool: NonEmployeePool
+        trigger: confirm
+
+resources:
+  Resources:
+    Table:
+      Type: AWS::DynamoDB::Table
+      DeletionPolicy: Retain
+      Properties:
+        AttributeDefinitions:
+          -
+            AttributeName: email
+            AttributeType: S
+        KeySchema:
+          -
+            AttributeName: email
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+        StreamSpecification:
+          StreamViewType: "NEW_AND_OLD_IMAGES"
+        TableName: ${self:provider.environment.ACCOUNT_TABLE}
+
+    EmployeePool:
+      Type: AWS::Cognito::UserPool
+      Properties:
+        UserPoolName: auth-employee-pool
+        Schema:
+          - Name: email
+            Required: true
+            Mutable: true
+        Policies:
+          PasswordPolicy:
+            MinimumLength: 6
+        AutoVerifiedAttributes: ["email"]
+
+    EmployeePoolClient:
+      Type: AWS::Cognito::UserPoolClient
+      Properties:
+        ClientName: employee-pool-ui
+        GenerateSecret: false
+        UserPoolId: { Ref: EmployeePool }
+        AccessTokenValidity: 5
+        IdTokenValidity: 5
+        ExplicitAuthFlows:
+          - "ADMIN_NO_SRP_AUTH"
+
+    NonEmployeePool:
+      Type: AWS::Cognito::UserPool
+      Properties:
+        UserPoolName: auth-non-employee-pool
+        Schema:
+          - Name: email
+            Required: true
+            Mutable: true
+        Policies:
+          PasswordPolicy:
+            MinimumLength: 6
+        AutoVerifiedAttributes: ["email"]
+
+    NonEmployeePoolClient:
+      Type: AWS::Cognito::UserPoolClient
+      Properties:
+        ClientName: non-employee-pool-ui
+        GenerateSecret: false
+        UserPoolId: { Ref: NonEmployeePool }
+        AccessTokenValidity: 5
+        IdTokenValidity: 5
+        ExplicitAuthFlows:
+          - "ADMIN_NO_SRP_AUTH"
+
+    BackendPictures:
+      Type: AWS::S3::Bucket
+      Properties:
+        BucketName: ${self:provider.environment.BACKEND_PICTURES}
