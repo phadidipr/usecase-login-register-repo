@@ -16,12 +16,12 @@ const poolDataVisitor = {
 };
 
 module.exports.handler = async (event, context, callback) => {
-    console.log('confirm event:', event);
+    //console.log('confirm event:', event);
     const { email, code, employeeId } = JSON.parse(event.body);
     // For non-employee, pass in employeeId as empty string!!
-    console.log('email:', email);
-    console.log('code:', code);
-    console.log('employeeId:', employeeId);
+    //console.log('email:', email);
+    //console.log('code:', code);
+    //console.log('employeeId:', employeeId);
     let userPool;
     if (employeeId)
         userPool = new AmazonCognitoIdentity.CognitoUserPool(poolDataEmployee);
@@ -33,7 +33,7 @@ module.exports.handler = async (event, context, callback) => {
     };
 
     const cognitoUser = new AmazonCognitoIdentity.CognitoUser(userData);
-    console.log('user:', cognitoUser);
+    //console.log('user:', cognitoUser);
     const response = await confirmUser(code, true, cognitoUser);
     console.log(response);
     if (response === 'SUCCESS')
@@ -44,16 +44,16 @@ module.exports.handler = async (event, context, callback) => {
 
 function confirmUser(code, forceAliasCreation, cognitoUser) {
     return new Promise((resolve) => {
-        console.log('authenticationCode:', code);
-        console.log('forceAliasCreation:', forceAliasCreation);
-        console.log('cognitoUser:', cognitoUser);
+        //console.log('authenticationCode:', code);
+        //console.log('forceAliasCreation:', forceAliasCreation);
+        //console.log('cognitoUser:', cognitoUser);
 
         cognitoUser.confirmRegistration(code, forceAliasCreation, function (err, result) {
             if (err) {
-                console.log('confirmUser error:', err);
+                //console.log('confirmUser error:', err);
                 return;
             }
-            console.log('confirmUser result:', result);
+            //console.log('confirmUser result:', result);
             resolve(result);
         });
     });

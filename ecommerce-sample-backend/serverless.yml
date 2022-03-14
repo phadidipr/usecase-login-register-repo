@@ -1,6 +1,11 @@
 service: ecommerce-sample-backend
 frameworkVersion: '3.2.0'
 
+custom:
+  apigwBinary:
+    types:
+      - 'multipart/form-data'
+
 provider:
   name: aws
   runtime: nodejs12.x

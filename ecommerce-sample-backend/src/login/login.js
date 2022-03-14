@@ -1,9 +1,7 @@
 'use strict';
 
-const uuid = require('uuid');
 const AWS = require('aws-sdk');
 const utils = require('../common/utils');
-//const config = require('../common/config');
 const dynamoDb = new AWS.DynamoDB.DocumentClient();
 AWS.config.setPromisesDependency(require('bluebird'));
 const cognito = new AWS.CognitoIdentityServiceProvider();
@@ -13,26 +11,18 @@ module.exports.handler = async (event, context, callback) => {
     try {
         console.log(event);
         const { email, password } = JSON.parse(event.body);
-        console.log(`email: ${email}, password: ${password}`);
+        //console.log(`email: ${email}, password: ${password}`);
         if (typeof userName !== 'string' || typeof password !== 'string') {
             var params = {
                 TableName: process.env.ACCOUNT_TABLE,
                 Key: {
                     email
                 }
-                //KeyConditionExpression: "email = :email AND password = :password",
-                //ExpressionAttributeNames: {
-                //    "#email": "email",
-                //    "#password": "password"
-                //},
-                //ExpressionAttributeValues: {
-                //    ":email": email
-                //}
             };
             const authData = { Username: email, Password: password };
             try {
                 const result = await dynamoDb.get(params).promise();
-                console.log('query result:', result);
+                //console.log('query result:', result);
                 if (result.Item.email === email && result.Item.password === password) {
                     let cognitoParams;
                     if (result.Item.employeeId) {
@@ -74,8 +64,8 @@ module.exports.handler = async (event, context, callback) => {
 
 function authenticateUser(authenticationData, poolData) {
     return new Promise((resolve) => {
-        console.log('authenticationData:', authenticationData);
-        console.log('poolData:', poolData);
+        //console.log('authenticationData:', authenticationData);
+        //console.log('poolData:', poolData);
         const authenticationDetails = new AmazonCognitoIdentity.AuthenticationDetails(authenticationData);
         const userPool = new AmazonCognitoIdentity.CognitoUserPool(poolData);
         const userData = {
@@ -86,11 +76,11 @@ function authenticateUser(authenticationData, poolData) {
         console.log('cognitoUser:', cognitoUser);
         cognitoUser.authenticateUser(authenticationDetails, {
             onSuccess: function (result) {
-                console.log('Authorized Result:', result);
+                //console.log('Authorized Result:', result);
                 return resolve({ statusCode: 200 });
             },
             onFailure: function (err) {
-                console.log('Authentication Error:', err);
+                //console.log('Authentication Error:', err);
                 return resolve({ statusCode: 400 });
             }
         })

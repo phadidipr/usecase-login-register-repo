@@ -1,9 +1,7 @@
 'use strict';
 
-const fs = require('fs');
 const AWS = require('aws-sdk');
 const utils = require('../common/utils');
-//const config = require('../common/config');
 const dynamoDb = new AWS.DynamoDB.DocumentClient();
 AWS.config.setPromisesDependency(require('bluebird'));
 const Jimp = require("jimp")
@@ -33,12 +31,13 @@ const poolDataVisitor = {
 
 module.exports.handler = async (event, context, callback) => {
     try {
-        console.log('event:', event);
-        const formData = await multipartParser.parse(event, false)
-        console.log('formData:', formData);
+        //console.log('event:', event);
+        const formData = await multipartParser.parse(event, true)
+        //console.log('formData:', formData);
         const file = formData.profilePic;
-        console.log('profilePic:', file)
-        console.log('profilePic contents:', file.content)
+        //console.log('profilePic:', file);
+        //console.log('profilePic contents:', file.content);
+        //console.log('file content size:', file.content.length);
         const firstName = formData.firstName;
         const lastName = formData.lastName;
         const email = formData.email;
@@ -50,12 +49,11 @@ module.exports.handler = async (event, context, callback) => {
         const bucket = process.env.BACKEND_PICTURES;
 
         const originalKey = `photos/${email}_original_${file.filename}`;
-        console.log('originalKey:', originalKey);
+        //console.log('originalKey:', originalKey);
 
         try {
-            //const bodyStream = fs.createReadStream(file.filename);
             const uploadResult = await uploadToS3(bucket, originalKey, file.content, file.contentType);
-            console.log("uploadToS3 result:", uploadResult)
+            //console.log("uploadToS3 result:", uploadResult)
         } catch (err) {
             console.log('uploadToS3 error:', err)
             return utils.createResponse(err.status, err);
@@ -63,7 +61,7 @@ module.exports.handler = async (event, context, callback) => {
         let signedOriginalUrl;
         try {
             signedOriginalUrl = await s3.getSignedUrl("getObject", { Bucket: bucket, Key: originalKey })
-            console.log('file URL:', signedOriginalUrl);
+            //console.log('file URL:', signedOriginalUrl);
         } catch (err) {
             return utils.createResponse(err.status, err);
         }
@@ -97,16 +95,16 @@ module.exports.handler = async (event, context, callback) => {
         try {
             if (formData.employeeId) {
                 const response = await registerUser(email, password, employeeId);
-                console.log(response);
+                //console.log(response);
             }
             else {
                 const response = await registerUser(email, password, '');
-                console.log(response);
+                //console.log(response);
             }
             await dynamoDb.put(dbParams).promise();
             return utils.createResponse(200, `user ${email} added`);
         } catch (err) {
-            console.log('dynamodb query error:', err);
+            //console.log('dynamodb query error:', err);
             utils.createResponse(err.status, err);
         }
     } catch (err) {
@@ -123,14 +121,14 @@ const isAllowedFile = (size, mimeType) => {
 
 const uploadToS3 = async (bucket, key, body, mimeType) => {
     const params = { Bucket: bucket, Key: key, Body: body, ContentType: mimeType };
-    console.log('uploadToS3 params:', params);
+    //console.log('uploadToS3 params:', params);
     return new Promise((resolve, reject) => {
         s3.upload(params, (err, data) => {
             if (err) {
-                console.log('s3 upload failure:', err);
+                //console.log('s3 upload failure:', err);
                 return reject(err);
             }
-            console.log('s3 upload success:', data);
+            //console.log('s3 upload success:', data);
             return resolve(data);
         })
     })
@@ -155,7 +153,7 @@ function registerUser(email, password, employeeId) {
         else
             userPool = new AmazonCognitoIdentity.CognitoUserPool(poolDataVisitor);
 
-        console.log('userPool:', userPool);
+        //console.log('userPool:', userPool);
         var attributeList = [];
         var dataEmail = {
             Name: 'email',
@@ -166,12 +164,12 @@ function registerUser(email, password, employeeId) {
         attributeList.push(attributeEmail);
         userPool.signUp(email, password, attributeList, null, function (err, result) {
             if (err) {
-                console.log('signUp error:', err);
+                //console.log('signUp error:', err);
                 return;
             }
             const cognitoUser = result.user;
-            console.log('user name is ', cognitoUser.getUsername());
-            console.log('signUp result:', result);
+            //console.log('user name is ', cognitoUser.getUsername());
+            //console.log('signUp result:', result);
             resolve(result);
         });
     });

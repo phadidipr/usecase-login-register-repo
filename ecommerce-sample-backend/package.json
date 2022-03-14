@@ -6,7 +6,7 @@
     "aws-multipart-parser": "^0.2.1",
     "aws-sdk": "^2.1085.0",
     "bluebird": "^3.7.2",
-    "fs": "^0.0.1-security",
+    "formidable-serverless": "^1.1.1",
     "jimp": "^0.16.1",
     "node-cmd": "^5.0.0",
     "uuid": "^8.3.2"

@@ -1,5 +1,5 @@
 const createResponse = (responseCode, responseBody) => {
-    console.log('responseBody:', responseBody)
+    //console.log('responseBody:', responseBody)
     const response = {
         statusCode: responseCode,
         headers: {
@@ -8,7 +8,7 @@ const createResponse = (responseCode, responseBody) => {
         },
         body: JSON.stringify(responseBody)
     };
-    console.log(`Sending response: ${JSON.stringify(response)}`);
+    //console.log(`Sending response: ${JSON.stringify(response)}`);
     return response;
 };
 
