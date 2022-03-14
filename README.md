@@ -46,10 +46,10 @@ After a successful registration attempt, a verification code is sent to the give
 ## Login Page
 •	This serves as the homepage, with an email/password form and a link to the Register page underneath
 •	A form takes in an email and password with Cognito implementation
-o	Submitting the form sends an API request to the Login Backend function
+	-	Submitting the form sends an API request to the Login Backend function
 ## Register Page
 •	A form takes in an email address, first name, last name, password, and profile image; there is also an option to include an employee id within the form
-o	Submitting the form sends an API request to the Register Backend function
+	-	Submitting the form sends an API request to the Register Backend function
 ## Employee Page
 •	This page is redirected to after a successful employee account login (from the Login Page)
 •	It will have a Presidio logo image file retrieved from S3 (URL) and a logout button underneath (that redirects to the Login Page)
