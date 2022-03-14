@@ -8,18 +8,18 @@ b.	When registering the user should be put into a AWS cognito Pool based on wher
 (Currently, the register backend function saves a corrupted file to the S3 bucket albeit with a valid URL in DynamoDB alongside an appropriate bucket key)
 3.	Show a login screen which upon login should validate which cognito pool the user belongs too and redirect to different pages.
 (The login screen has been tested and confirmed to work with the backend function. The backend function has been tested and confirmed to validate a login with the Cognito User pools via email address)
-4.	1 Home screen for non-employee user - dont show Presidio logo
+4.	One Home screen for non-employee user - dont show Presidio logo
 (A nonemployee screen exists and is redirected to on a successful nonemployee login and registration attempt)
-5.	1 Home screen for employee user - show Presidio logo.
+5.	One Home screen for employee user - show Presidio logo.
 (An employee screen exists and is redirected to on a successful employee login and registration attempt. The employee screen successfully retrieves an image of the Presidio logo through Cloudfront using S3)
 Use Serverless, s3, CDN, cognito, dynamodb , node JS , react to achieve the above
 # Database: DynamoDB Schema
-•	email: email address (String) to be used for login (frontend) screen and (backend) function, Primary Key
-•	firstName: first name (String) given by a user during registration
-•	lastName: last name (String) given by a user during registration
-•	employeeId: optional identifier (String) to determine employee/non-employee status when the frontend redirects from a successful login to an employee/non-employee Home Screen page
-•	password: a password (String) to be obtained during registration for use during the login process
-•	profilePic: a URL (String) to an S3 bucket-saved image that was uploaded during the registration
+• email: email address (String) to be used for login (frontend) screen and (backend) function, Primary Key
+• firstName: first name (String) given by a user during registration
+• lastName: last name (String) given by a user during registration
+• employeeId: optional identifier (String) to determine employee/non-employee status when the frontend redirects from a successful login to an employee/non-employee Home Screen page
+• password: a password (String) to be obtained during registration for use during the login process
+• profilePic: a URL (String) to an S3 bucket-saved image that was uploaded during the registration
 # Storage: S3 Buckets/Folders (eCommerce-sample-backend-dev)
 ## Page Files Folder (common)
 •	A folder containing a Presidio logo file and future necessary images to be loaded on Home screen pages

@@ -51,13 +51,13 @@ module.exports.handler = async (event, context, callback) => {
 
         const originalKey = `photos/${email}_original_${file.filename}`;
         console.log('originalKey:', originalKey);
-        //let uploadResult;
 
         try {
-            const bodyStream = fs.createReadStream(file.filename);
+            //const bodyStream = fs.createReadStream(file.filename);
             const uploadResult = await uploadToS3(bucket, originalKey, file.content, file.contentType);
             console.log("uploadToS3 result:", uploadResult)
         } catch (err) {
+            console.log('uploadToS3 error:', err)
             return utils.createResponse(err.status, err);
         }
         let signedOriginalUrl;
@@ -121,25 +121,19 @@ const isAllowedFile = (size, mimeType) => {
     return true;
 }
 
-const uploadToS3 = async (bucket, key, buffer, mimeType) => {
-    const params = { Bucket: bucket, Key: key, Body: buffer, ContentType: mimeType, ContentEncoding: 'base64' };
+const uploadToS3 = async (bucket, key, body, mimeType) => {
+    const params = { Bucket: bucket, Key: key, Body: body, ContentType: mimeType };
     console.log('uploadToS3 params:', params);
-    try {
-        const data = await s3.upload(params).promise()
-        console.log('uploadToS3 data to return:', data)
-        return data;
-    } catch (err) {
-        console.log('uploadToS3 error:', err)
-        return err;
-    }
-
-    //return new Promise((resolve, reject) => {
-    //    s3.upload(params, (err, data) => {
-    //        if (err) {
-    //            return reject(err);
-    //        } return resolve(data);
-    //    })
-    //})
+    return new Promise((resolve, reject) => {
+        s3.upload(params, (err, data) => {
+            if (err) {
+                console.log('s3 upload failure:', err);
+                return reject(err);
+            }
+            console.log('s3 upload success:', data);
+            return resolve(data);
+        })
+    })
 }
 
 const resize = (buffer, mimeType, width) =>
