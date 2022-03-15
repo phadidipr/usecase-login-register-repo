@@ -44,9 +44,9 @@ module.exports.handler = async (event, context, callback) => {
                     console.log('Cognito Response:', response);
                     const bucket = process.env.BACKEND_PICTURES;
                     console.log('env bucket:', bucket);
-                    let signedOriginalUrl;
+                    let signedThumbnailUrl;
                     try {
-                        signedOriginalUrl = await s3.getSignedUrl("getObject", { Bucket: bucket, Key: result.Item.profilePic })
+                        signedThumbnailUrl = await s3.getSignedUrl("getObject", { Bucket: bucket, Key: result.Item.profilePic })
                     } catch (err) {
                         console.log('s3 url error:', err);
                         return utils.createResponse(err.status, err);
@@ -57,14 +57,14 @@ module.exports.handler = async (event, context, callback) => {
                             firstName: result.Item.firstName,
                             lastName: result.Item.lastName,
                             employeeId: result.Item.employeeId,
-                            profilePic: signedOriginalUrl
+                            profilePic: signedThumbnailUrl
                         });
                     else
                         return utils.createResponse(200, {
                             email: result.Item.email,
                             firstName: result.Item.firstName,
                             lastName: result.Item.lastName,
-                            profilePic: signedOriginalUrl
+                            profilePic: signedThumbnailUrl
                         });
                 } else {
                     return utils.createResponse(

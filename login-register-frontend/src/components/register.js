@@ -68,7 +68,8 @@ function Register() {
             alert.show('Enter a valid employeeId');
             return;
         }
-        if (employeeId !== "" && !email.includes("@presidio.com")) {
+        //change this to '@presidio.com' for repo/prod
+        if (employeeId !== "" && !email.includes("@hotmail.com")) {
             alert.show('employeeId requires a Presidio email address');
             return;
         }

@@ -35,6 +35,8 @@ module.exports.handler = async (event, context, callback) => {
         const formData = await multipartParser.parse(event, true)
         //console.log('formData:', formData);
         const file = formData.profilePic;
+        //TODO: get filesize
+        //if (isAllowedFile)
         //console.log('profilePic:', file);
         //console.log('profilePic contents:', file.content);
         //console.log('file content size:', file.content.length);
@@ -46,7 +48,8 @@ module.exports.handler = async (event, context, callback) => {
         if (formData.employeeId) {
             employeeId = formData.employeeId.toUpperCase();
             let regex = new RegExp('^[0-9A-Z]{12}$');
-            if (!regex.test(employeeId) || !email.includes("@presidio.com"))
+            //change this to '@presidio.com' for repo/prod
+            if (!regex.test(employeeId) || !email.includes("@hotmail.com"))
                 return utils.createResponse(401, 'employee registration requires a Presidio email address and a valid employee ID of 12 alphanumeric characters');
         }
 
@@ -54,18 +57,22 @@ module.exports.handler = async (event, context, callback) => {
 
         const originalKey = `photos/${email}_original_${file.filename}`;
         //console.log('originalKey:', originalKey);
+        const thumbnailKey = `photos/${email}_thumbnail_${file.filename}`;
 
         try {
-            const uploadResult = await uploadToS3(bucket, originalKey, file.content, file.contentType);
-            //console.log("uploadToS3 result:", uploadResult)
+            await uploadToS3(bucket, originalKey, file.content, file.contentType);
+            const thumbnailBuffer = await resize(file.content, file.contentType, 400);
+            console.log('resized buffer:', thumbnailBuffer);
+            await uploadToS3(bucket, thumbnailKey, thumbnailBuffer, file.contentType);
         } catch (err) {
             console.log('uploadToS3 error:', err)
             return utils.createResponse(err.status, err);
         }
-        let signedOriginalUrl;
+        //let signedOriginalUrl
+        let signedThumbnailUrl;
         try {
-            signedOriginalUrl = await s3.getSignedUrl("getObject", { Bucket: bucket, Key: originalKey })
-            //console.log('file URL:', signedOriginalUrl);
+            //signedOriginalUrl = await s3.getSignedUrl("getObject", { Bucket: bucket, Key: originalKey })
+            signedThumbnailUrl = await s3.getSignedUrl("getObject", { Bucket: bucket, Key: thumbnailKey })
         } catch (err) {
             return utils.createResponse(err.status, err);
         }
@@ -81,7 +88,8 @@ module.exports.handler = async (event, context, callback) => {
                     email,
                     password,
                     employeeId,
-                    profilePic: originalKey
+                    profilePic: thumbnailKey,
+                    profilePicFull: originalKey
                 }
             };
         } else
@@ -92,7 +100,8 @@ module.exports.handler = async (event, context, callback) => {
                     lastName,
                     email,
                     password,
-                    profilePic: originalKey
+                    profilePic: thumbnailKey,
+                    profilePicFull: originalKey
                 }
             };
         console.log('dbParams:', dbParams);
@@ -107,7 +116,7 @@ module.exports.handler = async (event, context, callback) => {
                     lastName,
                     email,
                     employeeId,
-                    profilePic: signedOriginalUrl
+                    profilePic: signedThumbnailUrl
                 });
             }
             else {
@@ -118,7 +127,7 @@ module.exports.handler = async (event, context, callback) => {
                     firstName,
                     lastName,
                     email,
-                    profilePic: signedOriginalUrl
+                    profilePic: signedThumbnailUrl
                 });
             }
         } catch (err) {
