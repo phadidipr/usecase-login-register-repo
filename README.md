@@ -28,10 +28,10 @@ Use Serverless, s3, CDN, cognito, dynamodb , node JS , react to achieve the abov
 # Backend: Lambda Functions
 ## Register (POST)
 1.	Read multiform data from an API request that includes an email address, first name, last name, password, and profile image\
-a.	An employee id can be included or excluded to signify whether a user is an employee or non-employee (a valid employee registration requires an employee ID of 12 alphanumeric characters and a Presidio email address)\
+a.	An employee id can be included or excluded to signify whether a user is an employee or non-employee (a valid employee registration requires an employee ID of 12 alphanumeric characters and a Presidio email address)
 2.	Upload the image to S3 and generate a URL\
 a. aws-multipart-parser was used for parsing multiform data, with spotText set to true\
-b. The Lambda function's API Gateway enabled support for 'multipart/form-data' under Settings -> Binary Media Types\
+b. The Lambda function's API Gateway enabled support for 'multipart/form-data' under Settings -> Binary Media Types
 3.	Save the email, first name, last name, password, employee id (if entered), and S3 bucket key to a DynamoDB entry
 4.	Depending on whether an employee id was entered, add the account to a Cognito User Pool, either for employees or nonemployees
 5.	Return a response containing the email, first name, and last name upon success (hide S3 URL, employee id, and password for security purposes) if the function succeeds; return an error response if it fails
