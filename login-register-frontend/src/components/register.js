@@ -15,6 +15,8 @@ function Register() {
     let history = useHistory();
     const alert = useAlert();
 
+    let regex = new RegExp('^[0-9A-Z]{12}$');
+
     const paperStyle = {
         padding: 20,
         height: '70vh',
@@ -62,8 +64,18 @@ function Register() {
     }
 
     const onRegister = async () => {
+        if (employeeId !== "" && !regex.test(employeeId)) {
+            alert.show('Enter a valid employeeId');
+            return;
+        }
+        //change this to '@presidio.com' for repo/prod
+        if (employeeId !== "" && !email.includes("@hotmail.com")) {
+            alert.show('employeeId requires a Presidio email address');
+            return;
+        }
         const formData = await createFormData();
         console.log('createFormData:', formData.entries);
+        
 
         const result = await axios({
             url: "https://yu3rax9pf7.execute-api.us-west-2.amazonaws.com/dev/register",
@@ -149,7 +161,7 @@ function Register() {
                     onChange={handleFieldChange}
                 />
                 <TextField
-                    value={employeeId}
+                    value={employeeId.toUpperCase()}
                     name="employeeId"
                     label="Employee ID"
                     placeholder="Enter your employee ID number"
