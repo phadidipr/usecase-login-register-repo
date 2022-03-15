@@ -29,12 +29,14 @@ Use Serverless, s3, CDN, cognito, dynamodb , node JS , react to achieve the abov
 ## Register (POST)
 1.	Read multiform data from an API request that includes an email address, first name, last name, password, and profile image
 a.	An employee id can be included or excluded to signify whether a user is an employee or non-employee
-2.	Create a uuid for the new user
-3.	Upload the image to S3 and generate a URL
-4.	Save the uuid, email, first name, last name, password, employee id (if entered), and S3 URL to a DynamoDB entry
-5.	Return a response containing the uuid, email, first name, and last name upon success (hide S3 URL, employee id, and password for security purposes) if the function succeeds; return an error response if it fails
+2.	Upload the image to S3 and generate a URL
+a. aws-multipart-parser was used for parsing multiform data, with spotText set to true
+b. The Lambda function's API Gateway enabled support for 'multipart/form-data' under Settings -> Binary Media Types
+3.	Save the email, first name, last name, password, employee id (if entered), and S3 URL to a DynamoDB entry
+4.	Depending on whether an employee id was entered, add the account to a Cognito User Pool, either for employees or nonemployees
+5.	Return a response containing the email, first name, and last name upon success (hide S3 URL, employee id, and password for security purposes) if the function succeeds; return an error response if it fails
 ## Login (POST)
-1.	Read form data from an API request that contains an email address and password
+1.	Read formdata from an API request that contains an email address and password
 2.	If the email and password is valid, verify the identity using Cognito User/Identity Pools; if either or both is/are invalid, return an incorrect login response
 3.	If Cognito is verified, return a successful login response; otherwise return an authentication error response
 ## Confirm (GET)
@@ -50,9 +52,11 @@ After a successful registration attempt, a verification code is sent to the give
 ## Register Page
 •	A form takes in an email address, first name, last name, password, and profile image; there is also an option to include an employee id within the form
 	-	Submitting the form sends an API request to the Register Backend function
+	-	useEffect is used to guarantee the profile picture is saved to the setState
+	-	createFormData was called with await to ensure the image file is fully appended to formData
 ## Employee Page
 •	This page is redirected to after a successful employee account login (from the Login Page)
-•	It will have a Presidio logo image file retrieved from S3 (URL) and a logout button underneath (that redirects to the Login Page)
+•	It has a Presidio logo image file retrieved from Cloudfront/S3 and a logout button underneath (that redirects to the Login Page)
 •	If this page is attempted to being accessed without proper credentials, redirect to the Login Page
 ## Non-Employee Page
 •	This page is redirected to after a successful non-employee account login (from the Login Page)
