@@ -79,21 +79,21 @@ function Register() {
         if (result.status === 200) {
             if (employeeId !== "") {
                 const pageData = {
-                    firstName,
-                    lastName,
-                    email,
-                    employeeId,
-                    profilePic
+                    firstName: result.data.firstName,
+                    lastName: result.data.lastName,
+                    email: result.data.email,
+                    employeeId: result.data.employeeId,
+                    profilePic: result.data.profilePic
 
                 };
                 history.push({ pathname: '/employee', state: pageData });
             }
             else {
                 const pageData = {
-                    firstName,
-                    lastName,
-                    email,
-                    profilePic
+                    firstName: result.data.firstName,
+                    lastName: result.data.lastName,
+                    email: result.data.email,
+                    profilePic: result.data.profilePic
 
                 };
                 history.push({ pathname: '/visitor', state: pageData });

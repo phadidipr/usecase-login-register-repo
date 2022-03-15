@@ -4,12 +4,14 @@ const AWS = require('aws-sdk');
 const utils = require('../common/utils');
 const dynamoDb = new AWS.DynamoDB.DocumentClient();
 AWS.config.setPromisesDependency(require('bluebird'));
-const cognito = new AWS.CognitoIdentityServiceProvider();
+const s3 = new AWS.S3();
+//const cognito = new AWS.CognitoIdentityServiceProvider();
 const AmazonCognitoIdentity = require('amazon-cognito-identity-js');
 
 module.exports.handler = async (event, context, callback) => {
     try {
         console.log(event);
+        //TODO: get new signed url for every login, maybe change dynamoDb profilePic in register backend?
         const { email, password } = JSON.parse(event.body);
         //console.log(`email: ${email}, password: ${password}`);
         if (typeof userName !== 'string' || typeof password !== 'string') {
@@ -22,7 +24,7 @@ module.exports.handler = async (event, context, callback) => {
             const authData = { Username: email, Password: password };
             try {
                 const result = await dynamoDb.get(params).promise();
-                //console.log('query result:', result);
+                console.log('query result:', result);
                 if (result.Item.email === email && result.Item.password === password) {
                     let cognitoParams;
                     if (result.Item.employeeId) {
@@ -40,7 +42,30 @@ module.exports.handler = async (event, context, callback) => {
 
                     const response = await authenticateUser(authData, cognitoParams);
                     console.log('Cognito Response:', response);
-                    return utils.createResponse(200, result.Item);
+                    const bucket = process.env.BACKEND_PICTURES;
+                    console.log('env bucket:', bucket);
+                    let signedOriginalUrl;
+                    try {
+                        signedOriginalUrl = await s3.getSignedUrl("getObject", { Bucket: bucket, Key: result.Item.profilePic })
+                    } catch (err) {
+                        console.log('s3 url error:', err);
+                        return utils.createResponse(err.status, err);
+                    }
+                    if (result.Item.employeeId)
+                        return utils.createResponse(200, {
+                            email: result.Item.email,
+                            firstName: result.Item.firstName,
+                            lastName: result.Item.lastName,
+                            employeeId: result.Item.employeeId,
+                            profilePic: signedOriginalUrl
+                        });
+                    else
+                        return utils.createResponse(200, {
+                            email: result.Item.email,
+                            firstName: result.Item.firstName,
+                            lastName: result.Item.lastName,
+                            profilePic: signedOriginalUrl
+                        });
                 } else {
                     return utils.createResponse(
                         400,

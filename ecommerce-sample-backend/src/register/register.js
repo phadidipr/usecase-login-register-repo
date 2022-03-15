@@ -65,7 +65,7 @@ module.exports.handler = async (event, context, callback) => {
         } catch (err) {
             return utils.createResponse(err.status, err);
         }
-
+        //TODO: save the bucket key to db but return the url, then get the url from the bucket in login
         let dbParams;
         if (formData.employeeId) {
             console.log(`formData.employeeId: ${formData.employeeId}`);
@@ -77,7 +77,7 @@ module.exports.handler = async (event, context, callback) => {
                     email,
                     password,
                     employeeId,
-                    profilePic: signedOriginalUrl
+                    profilePic: originalKey
                 }
             };
         } else
@@ -88,24 +88,38 @@ module.exports.handler = async (event, context, callback) => {
                     lastName,
                     email,
                     password,
-                    profilePic: signedOriginalUrl
+                    profilePic: originalKey
                 }
             };
         console.log('dbParams:', dbParams);
+        //TODO: return the URL so register and login backend both give it to the appropriate frontend
         try {
             if (formData.employeeId) {
                 const response = await registerUser(email, password, employeeId);
-                //console.log(response);
+                console.log(response);
+                await dynamoDb.put(dbParams).promise();
+                return utils.createResponse(200, {
+                    firstName,
+                    lastName,
+                    email,
+                    employeeId,
+                    profilePic: signedOriginalUrl
+                });
             }
             else {
                 const response = await registerUser(email, password, '');
-                //console.log(response);
+                console.log(response);
+                await dynamoDb.put(dbParams).promise();
+                return utils.createResponse(200, {
+                    firstName,
+                    lastName,
+                    email,
+                    profilePic: signedOriginalUrl
+                });
             }
-            await dynamoDb.put(dbParams).promise();
-            return utils.createResponse(200, `user ${email} added`);
         } catch (err) {
             //console.log('dynamodb query error:', err);
-            utils.createResponse(err.status, err);
+            return utils.createResponse(err.status, err);
         }
     } catch (err) {
         return utils.createResponse(err.status, err);
@@ -169,7 +183,7 @@ function registerUser(email, password, employeeId) {
             }
             const cognitoUser = result.user;
             //console.log('user name is ', cognitoUser.getUsername());
-            //console.log('signUp result:', result);
+            console.log('signUp result:', result);
             resolve(result);
         });
     });

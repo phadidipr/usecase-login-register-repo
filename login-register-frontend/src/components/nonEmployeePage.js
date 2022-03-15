@@ -1,10 +1,12 @@
 import { React } from 'react';
 import { Button } from '@material-ui/core';
-import { useHistory, withRouter } from 'react-router-dom';
+import { useHistory, useLocation, withRouter } from 'react-router-dom';
 
-function NonEmployeePage(Component) {
+function NonEmployeePage() {
     const btstyle = { margin: '8px 0' };
     let history = useHistory();
+    let location = useLocation();
+    let profilePic = location.state.profilePic;
 
     const onLogout = async () => {
         history.push('/');
@@ -17,6 +19,8 @@ function NonEmployeePage(Component) {
         
         <div align="center">
             <h2>Non-Employee</h2>
+            <img src={profilePic} />
+            <br />
             <Button
                 type="submit"
                 color="primary"

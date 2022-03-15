@@ -10,6 +10,7 @@ function Login() {
     const [data, setData] = useState(initialData);
     let history = useHistory();
     const alert = useAlert();
+    //TODO: get new signed url for every login, maybe change dynamoDb profilePic in register backend?
 
     const paperStyle = {
         padding: 20,
@@ -45,22 +46,22 @@ function Login() {
         console.log(result);
         if (result.status === 200) {
             const resultData = result.data;
-            console.log('parsed data:', resultData)
+            //console.log('parsed data:', resultData)
             let pageData;
-            if (result.data.employeeId)
+            if (resultData.employeeId)
                 pageData = {
                     firstName: resultData.firstName,
                     lastName: resultData.lastName,
                     employeeId: resultData.employeeId,
                     email: resultData.email,
-                    profile_pic: resultData.profile_pic
+                    profilePic: resultData.profilePic
                 };
             else {
                 pageData = {
                     firstName: resultData.firstName,
                     lastName: resultData.lastName,
                     email: resultData.email,
-                    profile_pic: resultData.profile_pic
+                    profilePic: resultData.profilePic
                 };
             }
             // setData({
@@ -75,7 +76,7 @@ function Login() {
                 history.push({ pathname: '/visitor', state: pageData });
             }
         } else {
-            console.log(result);
+            //console.log(result);
             alert.show(result.body);
         }
     };
