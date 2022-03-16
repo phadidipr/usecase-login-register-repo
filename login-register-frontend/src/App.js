@@ -1,11 +1,12 @@
 import React from 'react';
-import { BrowserRouter as Router, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Redirect, Route } from 'react-router-dom';
 import Login from './components/login';
 import EmployeePage from './components/employeePage'
 import NonEmployeePage from './components/nonEmployeePage'
 import Register from './components/register'
 
 function App() {
+    //TODO: implement <Redirect to="/" /> with a href in login.js
     return (
         <Router>
             <div>

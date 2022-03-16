@@ -48,7 +48,7 @@ module.exports.handler = async (event, context, callback) => {
         if (formData.employeeId) {
             employeeId = formData.employeeId.toUpperCase();
             let regex = new RegExp('^[0-9A-Z]{12}$');
-            if (!regex.test(employeeId) || !email.includes("@presidio.com"))
+			if (!regex.test(employeeId) || !email.includes("@presidio.com"))
                 return utils.createResponse(401, 'employee registration requires a Presidio email address and a valid employee ID of 12 alphanumeric characters');
         }
 

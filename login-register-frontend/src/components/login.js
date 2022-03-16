@@ -10,7 +10,6 @@ function Login() {
     const [data, setData] = useState(initialData);
     let history = useHistory();
     const alert = useAlert();
-    //TODO: get new signed url for every login, maybe change dynamoDb profilePic in register backend?
 
     const paperStyle = {
         padding: 20,
@@ -44,7 +43,7 @@ function Login() {
             },
         });
         console.log(result);
-        if (result.status === 200) {
+        if (result.status === 200 && result.data.email) {
             const resultData = result.data;
             //console.log('parsed data:', resultData)
             let pageData;
@@ -77,7 +76,7 @@ function Login() {
             }
         } else {
             //console.log(result);
-            alert.show(result.body);
+            alert.show('Inorrect email and/or password');
         }
     };
 

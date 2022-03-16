@@ -1,13 +1,17 @@
 import { React } from 'react';
 import { Button } from '@material-ui/core';
-import { useHistory, useLocation, withRouter } from 'react-router-dom';
+import { useHistory, useLocation, withRouter, Redirect } from 'react-router-dom';
+//import { Login } from ('./login.js');
 
 function EmployeePage() {
     const btstyle = { margin: '8px 0' };
     let history = useHistory();
     let location = useLocation();
+    if (!location.state) {
+        history.push('/'); //Automatically redirect to login page when no credentials are given
+        return <Redirect to='/' />
+    }
     let profilePic = location.state.profilePic;
-    
 
     const onLogout = async () => {
         history.push('/');
