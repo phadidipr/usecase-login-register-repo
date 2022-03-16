@@ -16,6 +16,7 @@ function App() {
                     <Route exact path="/employee" component={EmployeePage} />
                     <Route exact path="/visitor" component={NonEmployeePage} />
                     <Route exact path="/register" component={Register} />
+                    <Redirect to="/" />
                 </div>
             </div>
         </Router>

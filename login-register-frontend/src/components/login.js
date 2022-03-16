@@ -1,5 +1,5 @@
 import { useState, React } from 'react';
-import { withRouter, useHistory } from 'react-router-dom';
+import { withRouter, useHistory, Link } from 'react-router-dom';
 import { Avatar, Button, Grid, Paper, TextField } from '@material-ui/core';
 import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import axios from 'axios';
@@ -124,7 +124,7 @@ function Login() {
                     Login
                 </Button>
             </Paper>
-            <a href='/register'>New User? Register Here</a>
+            <Link to='/register'>New User? Register Here</Link>
         </Grid>
     );
 }
